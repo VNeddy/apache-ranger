@@ -26,26 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellScanner;
-import org.apache.hadoop.hbase.Coprocessor;
-import org.apache.hadoop.hbase.CoprocessorEnvironment;
-import org.apache.hadoop.hbase.HColumnDescriptor;
-import org.apache.hadoop.hbase.HRegionInfo;
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.NamespaceDescriptor;
-import org.apache.hadoop.hbase.ProcedureInfo;
-import org.apache.hadoop.hbase.ServerName;
-import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Append;
-import org.apache.hadoop.hbase.client.Delete;
-import org.apache.hadoop.hbase.client.Durability;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Increment;
-import org.apache.hadoop.hbase.client.Mutation;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.*;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.coprocessor.BulkLoadObserver;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorService;
 import org.apache.hadoop.hbase.coprocessor.MasterCoprocessorEnvironment;
@@ -62,6 +44,7 @@ import org.apache.hadoop.hbase.io.Reference;
 import org.apache.hadoop.hbase.io.hfile.CacheConfig;
 import org.apache.hadoop.hbase.master.RegionPlan;
 import org.apache.hadoop.hbase.master.procedure.MasterProcedureEnv;
+import org.apache.hadoop.hbase.net.Address;
 import org.apache.hadoop.hbase.procedure2.ProcedureExecutor;
 import org.apache.hadoop.hbase.protobuf.generated.AccessControlProtos;
 import org.apache.hadoop.hbase.protobuf.generated.AccessControlProtos.CheckPermissionsRequest;
@@ -100,7 +83,6 @@ import com.google.protobuf.RpcCallback;
 import com.google.protobuf.RpcController;
 import com.google.protobuf.Service;
 import java.util.Set;
-import com.google.common.net.HostAndPort;
 
 public class RangerAuthorizationCoprocessor implements MasterObserver, RegionObserver, RegionServerObserver, BulkLoadObserver, AccessControlProtos.AccessControlService.Interface, CoprocessorService, Coprocessor {
 
@@ -361,6 +343,18 @@ public class RangerAuthorizationCoprocessor implements MasterObserver, RegionObs
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("<== RangerAuthorizationCoprocessor.preBulkLoadHFile()");
 		}	
+
+	}
+
+	@Override
+	public void preCommitStoreFile(ObserverContext<RegionCoprocessorEnvironment> observerContext, byte[] bytes, List<Pair<Path, Path>> list)
+		throws IOException {
+
+	}
+
+	@Override
+	public void postCommitStoreFile(ObserverContext<RegionCoprocessorEnvironment> observerContext, byte[] bytes, Path path, Path path1)
+		throws IOException {
 
 	}
 
@@ -1598,6 +1592,12 @@ public class RangerAuthorizationCoprocessor implements MasterObserver, RegionObs
 	}
 
 	@Override
+	public InternalScanner preFlushScannerOpen(ObserverContext<RegionCoprocessorEnvironment> observerContext, Store store, KeyValueScanner keyValueScanner, InternalScanner internalScanner, long l)
+		throws IOException {
+		return null;
+	}
+
+	@Override
 	public InternalScanner preFlush(ObserverContext<RegionCoprocessorEnvironment> c, Store store, InternalScanner scanner) throws IOException {
 		
 		final InternalScanner ret;
@@ -1754,6 +1754,12 @@ public class RangerAuthorizationCoprocessor implements MasterObserver, RegionObs
 		}
 		
 		return ret;
+	}
+
+	@Override
+	public InternalScanner preCompactScannerOpen(ObserverContext<RegionCoprocessorEnvironment> observerContext, Store store, List<? extends KeyValueScanner> list, ScanType scanType, long l, InternalScanner internalScanner, CompactionRequest compactionRequest, long l1)
+		throws IOException {
+		return null;
 	}
 
 	@Override
@@ -3241,6 +3247,18 @@ public class RangerAuthorizationCoprocessor implements MasterObserver, RegionObs
 	}
 
 	@Override
+	public boolean preSetSplitOrMergeEnabled(ObserverContext<MasterCoprocessorEnvironment> observerContext, boolean b, Admin.MasterSwitchType masterSwitchType)
+		throws IOException {
+		return b;
+	}
+
+	@Override
+	public void postSetSplitOrMergeEnabled(ObserverContext<MasterCoprocessorEnvironment> observerContext, boolean b, Admin.MasterSwitchType masterSwitchType)
+		throws IOException {
+
+	}
+
+	@Override
 	public void postBalanceSwitch(ObserverContext<MasterCoprocessorEnvironment> ctx, boolean oldValue, boolean newValue) throws IOException {
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("==> RangerAuthorizationCoprocessor.postBalanceSwitch()");
@@ -3727,6 +3745,52 @@ public class RangerAuthorizationCoprocessor implements MasterObserver, RegionObs
 	}
 
 	@Override
+	public void preDispatchMerge(ObserverContext<MasterCoprocessorEnvironment> observerContext, HRegionInfo hRegionInfo, HRegionInfo hRegionInfo1)
+		throws IOException {
+
+	}
+
+	@Override
+	public void postDispatchMerge(ObserverContext<MasterCoprocessorEnvironment> observerContext, HRegionInfo hRegionInfo, HRegionInfo hRegionInfo1)
+		throws IOException {
+
+	}
+
+	@Override
+	public void preGetClusterStatus(ObserverContext<MasterCoprocessorEnvironment> observerContext) throws IOException {
+
+	}
+
+	@Override
+	public void postGetClusterStatus(ObserverContext<MasterCoprocessorEnvironment> observerContext, ClusterStatus clusterStatus)
+		throws IOException {
+
+	}
+
+	@Override
+	public void preClearDeadServers(ObserverContext<MasterCoprocessorEnvironment> observerContext) throws IOException {
+
+	}
+
+	@Override
+	public void postClearDeadServers(ObserverContext<MasterCoprocessorEnvironment> observerContext, List<ServerName> list, List<ServerName> list1)
+		throws IOException {
+
+	}
+
+	@Override
+	public void preMoveServers(ObserverContext<MasterCoprocessorEnvironment> observerContext, Set<Address> set, String s)
+		throws IOException {
+
+	}
+
+	@Override
+	public void postMoveServers(ObserverContext<MasterCoprocessorEnvironment> observerContext, Set<Address> set, String s)
+		throws IOException {
+
+	}
+
+	@Override
 	public void preWALRestore(ObserverContext<RegionCoprocessorEnvironment> ctx,HRegionInfo info, HLogKey logKey, WALEdit logEdit) throws IOException {
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("==> RangerAuthorizationCoprocessor.preWALRestore()");
@@ -3778,13 +3842,37 @@ public class RangerAuthorizationCoprocessor implements MasterObserver, RegionObs
  
   // TODO : need override annotations for all of the following methods
 
-  public void preMoveServers(final ObserverContext<MasterCoprocessorEnvironment> ctx, Set<HostAndPort> servers, String targetGroup) throws IOException {}
-  public void postMoveServers(ObserverContext<MasterCoprocessorEnvironment> ctx, Set<HostAndPort> servers, String targetGroup) throws IOException {}
   public void preMoveTables(final ObserverContext<MasterCoprocessorEnvironment> ctx, Set<TableName> tables, String targetGroup) throws IOException {}
   public void postMoveTables(final ObserverContext<MasterCoprocessorEnvironment> ctx, Set<TableName> tables, String targetGroup) throws IOException {}
-  public void preRemoveRSGroup(final ObserverContext<MasterCoprocessorEnvironment> ctx, String name) throws IOException {}
+
+	@Override
+	public void preMoveServersAndTables(ObserverContext<MasterCoprocessorEnvironment> observerContext, Set<Address> set, Set<TableName> set1, String s)
+		throws IOException {
+
+	}
+
+	@Override
+	public void postMoveServersAndTables(ObserverContext<MasterCoprocessorEnvironment> observerContext, Set<Address> set, Set<TableName> set1, String s)
+		throws IOException {
+
+	}
+
+	public void preRemoveRSGroup(final ObserverContext<MasterCoprocessorEnvironment> ctx, String name) throws IOException {}
   public void postRemoveRSGroup(final ObserverContext<MasterCoprocessorEnvironment> ctx, String name) throws IOException {}
-  public void preBalanceRSGroup(final ObserverContext<MasterCoprocessorEnvironment> ctx, String groupName) throws IOException {}
+
+	@Override
+	public void preRemoveServers(ObserverContext<MasterCoprocessorEnvironment> observerContext, Set<Address> set)
+		throws IOException {
+
+	}
+
+	@Override
+	public void postRemoveServers(ObserverContext<MasterCoprocessorEnvironment> observerContext, Set<Address> set)
+		throws IOException {
+
+	}
+
+	public void preBalanceRSGroup(final ObserverContext<MasterCoprocessorEnvironment> ctx, String groupName) throws IOException {}
   public void postBalanceRSGroup(final ObserverContext<MasterCoprocessorEnvironment> ctx, String groupName, boolean balancerRan) throws IOException {}
   public void preAddRSGroup(ObserverContext<MasterCoprocessorEnvironment> ctx, String name) throws IOException {}
   public void postAddRSGroup(ObserverContext<MasterCoprocessorEnvironment> ctx, String name) throws IOException {}
